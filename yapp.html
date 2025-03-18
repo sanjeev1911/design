@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotlight - Talent & Studio Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
+        nav {
+            width: 100%;
+            padding: 20px 40px;
+            background: #111;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #333;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            color: #ff0000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ff0000;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: #222;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #ff0000;
+            outline: none;
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            text-transform: uppercase;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #cc0000;
+            transform: scale(1.02);
+        }
+
+        .dashboard-section, .studio-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+
+        .stats-grid, .audition-list, .posted-auditions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .stat-card, .audition-card, .audition-post {
+            background: #222;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover, .audition-card:hover, .audition-post:hover {
+            border-color: #ff0000;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .stat-card h4, .audition-card h3, .audition-post h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #ff0000;
+        }
+
+        .stat-card p, .audition-card p, .audition-post p {
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .role-selection {
+            margin-top: 100px;
+            text-align: center;
+        }
+
+        .role-selection button {
+            width: 200px;
+            margin: 10px;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            nav { padding: 15px; }
+            .nav-links { margin-top: 10px; justify-content: center; gap: 15px; }
+            .nav-links a { font-size: 14px; }
+            h2 { font-size: 24px; }
+            .stats-grid, .audition-list, .posted-auditions { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="logo">SPOTLIGHT</div>
+            <div class="nav-links" id="navLinks">
+                <!-- Dynamically populated based on role -->
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Role Selection -->
+        <div id="role-selection" class="role-selection">
+            <h2>Welcome to Spotlight</h2>
+            <p>Choose your role:</p>
+            <button onclick="setRole('talent')">I'm Talent</button>
+            <button onclick="setRole('studio')">I'm a Studio</button>
+        </div>
+
+        <!-- Talent Login -->
+        <div id="talent-login" class="form-container hidden">
+            <h2>Talent Login</h2>
+            <form id="talentLoginForm">
+                <div class="form-group">
+                    <label for="talent-name">Name</label>
+                    <input type="text" id="talent-name" value="Swarna Penumetcha" required>
+                </div>
+                <div class="form-group">
+                    <label for="talent-password">Password</label>
+                    <input type="password" id="talent-password" required>
+                </div>
+                <button type="submit">Log in</button>
+            </form>
+            <p>Not registered? <a href="#" onclick="showSection('talent-signup')">Sign Up</a></p>
+        </div>
+
+        <!-- Talent Sign Up -->
+        <div id="talent-signup" class="form-container hidden">
+            <h2>Talent Sign Up</h2>
+            <form id="talentSignupForm">
+                <div class="form-group">
+                    <label for="signup-name">Name</label>
+                    <input type="text" id="signup-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" required>
+                </div>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+
+        <!-- Talent Dashboard -->
+        <div id="talent-dashboard" class="dashboard hidden">
+            <h2>Talent Dashboard</h2>
+            <div class="dashboard-section">
+                <h3 id="talent-welcome">Welcome!</h3>
+                <div class="stats-grid">
+                    <div class="stat-card"><h4>Active Auditions</h4><p>15</p></div>
+                    <div class="stat-card"><h4>Applications</h4><p>8</p></div>
+                    <div class="stat-card"><h4>Callbacks</h4><p>3</p></div>
+                    <div class="stat-card"><h4>Success Rate</h4><p>37%</p></div>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3>Browse Auditions</h3>
+                <div class="audition-list" id="talent-auditions">
+                    <!-- Dynamically populated from studio posts -->
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3>Registered Auditions</h3>
+                <div class="audition-list" id="registered-auditions">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Talent Upload Example (simplified) -->
+        <div id="talent-upload-1" class="form-container hidden">
+            <h2>Apply: Masala Action Hero</h2>
+            <div class="upload-section">
+                <form id="uploadForm1">
+                    <div class="form-group">
+                        <label for="video1">Audition Video</label>
+                        <input type="file" id="video1" accept="video/*" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="headshot1">Headshot</label>
+                        <input type="file" id="headshot1" accept="image/*" required>
+                    </div>
+                    <button type="submit">Submit Application</button>
+                </form>
+            </div>
+            <button onclick="showSection('talent-dashboard')">Back to Dashboard</button>
+        </div>
+
+        <!-- Studio Login -->
+        <div id="studio-login" class="studio-section hidden">
+            <h2>Studio Login</h2>
+            <form id="studioLoginForm">
+                <div class="form-group">
+                    <label for="studio-name">Studio Name</label>
+                    <input type="text" id="studio-name" value="Yash Raj Films" required>
+                </div>
+                <div class="form-group">
+                    <label for="studio-password">Password</label>
+                    <input type="password" id="studio-password" required>
+                </div>
+                <button type="submit">Log in</button>
+            </form>
+        </div>
+
+        <!-- Studio Dashboard -->
+        <div id="studio-dashboard" class="studio-section hidden">
+            <h2>Studio Dashboard</h2>
+            <div class="studio-section">
+                <h3 id="studio-welcome">Welcome!</h3>
+                <div class="posted-auditions" id="posted-auditions">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Studio Post Audition -->
+        <div id="studio-post-audition" class="studio-section hidden">
+            <h2>Post New Audition</h2>
+            <form id="postAuditionForm">
+                <div class="form-group">
+                    <label for="title">Audition Title</label>
+                    <input type="text" id="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="age-range">Age Range</label>
+                    <input type="text" id="age-range" placeholder="e.g., 25-35" required>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" required>
+                </div>
+                <div class="form-group">
+                    <label for="deadline">Deadline</label>
+                    <input type="date" id="deadline" required>
+                </div>
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <select id="type" required>
+                        <option value="">Select Type</option>
+                        <option value="Bollywood Masala Film">Bollywood Masala Film</option>
+                        <option value="Romantic Drama">Romantic Drama</option>
+                        <option value="Dance Sequence">Dance Sequence</option>
+                        <option value="Comedy Film">Comedy Film</option>
+                        <option value="Action Thriller">Action Thriller</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" required></textarea>
+                </div>
+                <button type="submit">Post Audition</button>
+            </form>
+        </div>
+
+        <!-- Shared About Us -->
+        <div id="about" class="form-container hidden">
+            <h2>About Spotlight</h2>
+            <p>Spotlight is a revolutionary platform launched in 2025, connecting Bollywood talent with top studios. Whether you're an aspiring actor or a producer scouting the next big star, we’ve got you covered.</p>
+        </div>
+
+        <!-- Shared Contact -->
+        <div id="contact" class="form-container hidden">
+            <h2>Contact</h2>
+            <p>Email: support@spotlight.com</p>
+            <p>Phone: (022) 1234-5678</p>
+        </div>
+    </div>
+
+    <script>
+        let userRole = localStorage.getItem('userRole') || null;
+        let talentName = localStorage.getItem('talentName') || 'Swarna';
+        let studioName = localStorage.getItem('studioName') || 'Yash Raj Films';
+        let registeredAuditions = JSON.parse(localStorage.getItem('registeredAuditions')) || [];
+        let postedAuditions = JSON.parse(localStorage.getItem('postedAuditions')) || [];
+
+        function setRole(role) {
+            userRole = role;
+            localStorage.setItem('userRole', role);
+            updateNavLinks();
+            showSection(${role}-login);
+        }
+
+        function updateNavLinks() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.innerHTML = '';
+            if (userRole === 'talent') {
+                navLinks.innerHTML = `
+                    <a href="#" onclick="showSection('talent-dashboard')">Dashboard</a>
+                    <a href="#" onclick="showSection('about')">About Us</a>
+                    <a href="#" onclick="showSection('contact')">Contact</a>
+                    <a href="#" id="logout">Logout</a>
+                `;
+            } else if (userRole === 'studio') {
+                navLinks.innerHTML = `
+                    <a href="#" onclick="showSection('studio-dashboard')">Dashboard</a>
+                    <a href="#" onclick="showSection('studio-post-audition')">Post Audition</a>
+                    <a href="#" onclick="showSection('about')">About Us</a>
+                    <a href="#" onclick="showSection('contact')">Contact</a>
+                    <a href="#" id="logout">Logout</a>
+                `;
+            }
+        }
+
+        function showSection(sectionId) {
+            const sections = ['role-selection', 'talent-login', 'talent-signup', 'talent-dashboard', 'talent-upload-1', 'studio-login', 'studio-dashboard', 'studio-post-audition', 'about', 'contact'];
+            sections.forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            if (sectionId === 'talent-dashboard') {
+                document.getElementById('talent-welcome').textContent = Welcome, ${talentName}!;
+                displayTalentAuditions();
+                displayRegisteredAuditions();
+            } else if (sectionId === 'studio-dashboard') {
+                document.getElementById('studio-welcome').textContent = Welcome, ${studioName}!;
+                displayPostedAuditions();
+            }
+        }
+
+        function displayTalentAuditions() {
+            const auditionList = document.getElementById('talent-auditions');
+            auditionList.innerHTML = '';
+            postedAuditions.forEach((audition, index) => {
+                const div = document.createElement('div');
+                div.className = 'audition-card';
+                div.innerHTML = `
+                    <h3>${audition.title}</h3>
+                    <p>Age: ${audition.ageRange} | Location: ${audition.location}</p>
+                    <p>Deadline: ${audition.deadline}</p>
+                    <p>Type: ${audition.type}</p>
+                    <button onclick="showSection('talent-upload-1')">Apply</button>
+                `;
+                auditionList.appendChild(div);
+            });
+        }
+
+        function displayRegisteredAuditions() {
+            const registeredList = document.getElementById('registered-auditions');
+            registeredList.innerHTML = '';
+            registeredAuditions.forEach((audition, index) => {
+                const div = document.createElement('div');
+                div.className = 'audition-card';
+                div.innerHTML = `
+                    <h3>${audition.title}</h3>
+                    <p>Age: ${audition.ageRange} | Location: ${audition.location}</p>
+                    <p>Deadline: ${audition.deadline}</p>
+                    <p>Type: ${audition.type}</p>
+                    <button onclick="deleteRegisteredAudition(${index})" style="background: #ccc; color: #000;">Delete</button>
+                `;
+                registeredList.appendChild(div);
+            });
+        }
+
+        function deleteRegisteredAudition(index) {
+            registeredAuditions.splice(index, 1);
+            localStorage.setItem('registeredAuditions', JSON.stringify(registeredAuditions));
+            displayRegisteredAuditions();
+        }
+
+        function displayPostedAuditions() {
+            const postedList = document.getElementById('posted-auditions');
+            postedList.innerHTML = '';
+            postedAuditions.forEach((audition, index) => {
+                const div = document.createElement('div');
+                div.className = 'audition-post';
+                div.innerHTML = `
+                    <h3>${audition.title}</h3>
+                    <p>Age: ${audition.ageRange} | Location: ${audition.location}</p>
+                    <p>Deadline: ${audition.deadline}</p>
+                    <p>Type: ${audition.type}</p>
+                    <button onclick="deletePostedAudition(${index})" style="background: #ccc; color: #000;">Delete</button>
+                `;
+                postedList.appendChild(div);
+            });
+        }
+
+        function deletePostedAudition(index) {
+            postedAuditions.splice(index, 1);
+            localStorage.setItem('postedAuditions', JSON.stringify(postedAuditions));
+            displayPostedAuditions();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Talent Login
+            document.getElementById('talentLoginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('talent-name').value;
+                const password = document.getElementById('talent-password').value;
+                if (name && password) {
+                    talentName = name;
+                    localStorage.setItem('talentName', name);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    showSection('talent-dashboard');
+                }
+            });
+
+            // Talent Sign Up
+            document.getElementById('talentSignupForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('signup-password').value;
+                const dob = document.getElementById('dob').value;
+                if (name && email && password && dob) {
+                    talentName = name;
+                    localStorage.setItem('talentName', name);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    showSection('talent-dashboard');
+                }
+            });
+
+            // Talent Upload
+            document.getElementById('uploadForm1').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const audition = {
+                    title: 'Masala Action Hero',
+                    ageRange: '25-35',
+                    location: 'Mumbai',
+                    deadline: 'March 15, 2025',
+                    type: 'Bollywood Masala Film'
+                };
+                registeredAuditions.push(audition);
+                localStorage.setItem('registeredAuditions', JSON.stringify(registeredAuditions));
+                alert('Application submitted!');
+                showSection('talent-dashboard');
+            });
+
+            // Studio Login
+            document.getElementById('studioLoginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('studio-name').value;
+                const password = document.getElementById('studio-password').value;
+                if (name && password) {
+                    studioName = name;
+                    localStorage.setItem('studioName', name);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    showSection('studio-dashboard');
+                }
+            });
+
+            // Studio Post Audition
+            document.getElementById('postAuditionForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('title').value;
+                const ageRange = document.getElementById('age-range').value;
+                const location = document.getElementById('location').value;
+                const deadline = document.getElementById('deadline').value;
+                const type = document.getElementById('type').value;
+                const description = document.getElementById('description').value;
+                if (title && ageRange && location && deadline && type && description) {
+                    const audition = { title, ageRange, location, deadline, type, description };
+                    postedAuditions.push(audition);
+                    localStorage.setItem('postedAuditions', JSON.stringify(postedAuditions));
+                    alert('Audition posted!');
+                    showSection('studio-dashboard');
+                }
+            });
+
+            // Logout
+            document.getElementById('logout').addEventListener('click', () => {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('talentName');
+                localStorage.removeItem('studioName');
+                localStorage.removeItem('userRole');
+                userRole = null;
+                talentName = 'Swarna';
+                studioName = 'Yash Raj Films';
+                showSection('role-selection');
+                document.getElementById('navLinks').innerHTML = '';
+            });
+
+            // Initial Load
+            if (localStorage.getItem('isLoggedIn') && userRole) {
+                showSection(${userRole}-dashboard);
+                updateNavLinks();
+            } else {
+                showSection('role-selection');
+            }
+        });
+    </script>
+</body>
+</html>
